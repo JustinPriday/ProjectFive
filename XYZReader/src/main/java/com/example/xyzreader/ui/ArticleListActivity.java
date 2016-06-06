@@ -1,5 +1,7 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.TargetApi;
+import android.app.ActivityOptions;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -18,6 +21,7 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
@@ -34,9 +38,13 @@ import com.example.xyzreader.data.UpdaterService;
 public class ArticleListActivity extends ActionBarActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String DETAILFRAGMENT_TAG = "dft";
+
     private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
+    private long mCurrentID = -1;
+    private boolean mTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +60,12 @@ public class ArticleListActivity extends ActionBarActivity implements
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         getLoaderManager().initLoader(0, null, this);
+
+        if (findViewById(R.id.detail_container) != null) {
+            mTwoPane = true;
+        } else {
+            mTwoPane = false;
+        }
 
         if (savedInstanceState == null) {
             refresh();
@@ -126,14 +140,26 @@ public class ArticleListActivity extends ActionBarActivity implements
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
             View view = getLayoutInflater().inflate(R.layout.list_item_article, parent, false);
             final ViewHolder vh = new ViewHolder(view);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+                    if (mTwoPane) {
+                        mCurrentID = getItemId(vh.getAdapterPosition());
+                        loadDetailFragment();
+                    } else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            mCurrentID = getItemId(vh.getAdapterPosition());
+                            ImageView timage = (ImageView) view.findViewById(R.id.thumbnail);
+                            loadDetailActivity(timage);
+
+                        } else {
+                            startActivity(new Intent(Intent.ACTION_VIEW,
+                                    ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+                        }
+                    }
                 }
             });
             return vh;
@@ -160,6 +186,30 @@ public class ArticleListActivity extends ActionBarActivity implements
         public int getItemCount() {
             return mCursor.getCount();
         }
+    }
+
+    private void loadDetailActivity(ImageView inView) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            Bundle bundle = ActivityOptions
+                    .makeSceneTransitionAnimation(this, inView, getString(R.string.transition_photo))
+                    .toBundle();
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    ItemsContract.Items.buildItemUri(mCurrentID)),bundle);
+
+        }
+    }
+
+    private void loadDetailFragment() {
+        Bundle args = new Bundle();
+        args.putLong(ArticleDetailFragment.ARG_ITEM_ID, mCurrentID);
+
+        ArticleDetailFragment fragment = new ArticleDetailFragment();
+        fragment.setArguments(args);
+
+        getFragmentManager().beginTransaction()
+                .replace(R.id.detail_container, fragment, DETAILFRAGMENT_TAG)
+                .commit();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

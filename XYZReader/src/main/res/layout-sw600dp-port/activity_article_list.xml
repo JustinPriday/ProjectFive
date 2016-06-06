@@ -10,7 +10,7 @@
         android:layout_height="@dimen/list_appbar_height"
         android:elevation="@dimen/appbar_elevation"
         android:fitsSystemWindows="true"
-        android:background="@color/theme_primary"
+        android:background="@color/theme_primary_dark"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -51,7 +51,6 @@
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
-
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
