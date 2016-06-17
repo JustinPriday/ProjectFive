@@ -49,7 +49,7 @@
         android:elevation="0dp"
         android:layout_below="@id/appbar"
         android:orientation="horizontal">
-        
+
         <FrameLayout
             android:id="@+id/list_container"
             android:layout_width="0dp"
