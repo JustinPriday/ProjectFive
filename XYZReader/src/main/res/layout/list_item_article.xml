@@ -43,7 +43,8 @@
                 android:paddingLeft="@dimen/list_item_title_padding_side"
                 android:paddingRight="@dimen/list_item_title_padding_side"
                 android:paddingTop="@dimen/list_item_title_padding_top"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:textAppearance="@style/TextAppearance.Headline.Bacon"/>
 
             <TextView
                 android:id="@+id/article_subtitle"

@@ -32,4 +32,16 @@
         <item name="android:textSize">0sp</item>
     </style>
 
+    <style name="TextAppearance.Headline.Bacon">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">normal</item>
+        <item name="android:textColor">@android:color/secondary_text_light</item>
+    </style>
+
+    <style name="TextAppearance" parent="TextAppearance.AppCompat"/>
+
+    <style name="TextAppearance.Headline">
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 </resources>
